@@ -8,8 +8,9 @@ from flask import Flask, render_template, request, session, redirect, g, jsonify
 from sqlalchemy import create_engine, Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import SingletonThreadPool
 
-engine = create_engine('sqlite:///sample.sqlite3')
+engine = create_engine('sqlite:///read.sqlite3', echo=True, connect_args={"check_same_thread": False})
 Base = declarative_base()
 app = Flask(__name__)
 #app.secret_key = b"random string..."
@@ -18,17 +19,19 @@ class Mydata(Base):
   __tablename__ = 'mydata'
 
   id = Column(Integer, primary_key=True)
-  name = Column(String(255))
-  mail = Column(String(255))
-  age = Column(Integer)
+  title = Column(String(255))
+  author = Column(String(255))
+  date = Column(String(255))
+  content = Column(String(255))
 
   #get dict data
   def toDict(self):
     return {
       'id':int(self.id),
-      'name':str(self.name),
-      'mail':str(self.mail),
-      'age':int(self.age)
+      'title':str(self.title),
+      'author':str(self.author),
+      'date':self.date,
+      'content':str(self.content)
     }
 
 #get list data
@@ -48,7 +51,7 @@ def getAll():
 
 @app.route('/', methods=['GET'])
 def index():
-  return render_template('index.html', title="Index", message ="SQlite Database",alert='データを追加してね',id=id)
+  return render_template('index.html', title="読書記録アプリ",alert='自分専用の読書記録をつけていこう！',id=id)
 
 @app.route('/ajax/', methods=['GET'])
 def ajax():
@@ -57,10 +60,11 @@ def ajax():
 
 @app.route('/form', methods=['post'])
 def form():
-  name = request.form.get('name')
-  mail = request.form.get('mail')
-  age = int(request.form.get('age'))
-  mydata = Mydata(name=name, mail=mail, age=age)
+  title = request.form.get('title')
+  author = request.form.get('author')
+  date = request.form.get('date')
+  content = request.form.get('content')
+  mydata = Mydata(title=title, author=author, date=date,content=content)
   Session = sessionmaker(bind=engine)
   ses = Session()
   ses.add(mydata)
@@ -68,38 +72,6 @@ def form():
   ses.close()
   return 'ok'
 
-
-# @app.route('/<id>', methods=["GET"])
-# def index_id(id):
-#   return render_template('index.html', title="INDEX", id=id,  message='sqlite3 database',alert = 'this is sqlite3 database')
-
-# @app.route('/ajax/<id>', methods=['GET'])
-# def ajax_id(id):
-#   Session = sessionmaker(bind=engine)
-#   ses=Session()
-#   mydata = session.query(Mydata).filter(Mydata.id == id).one()
-#   ses.close()
-#   return jsonify(mydata.toDict());
-
-# @app.route('/form/<id>', methods=["post"])
-# def form_id(id):
-#   name = request.form.get('name')
-#   mail = request.form.get('mail')
-#   age = int(request.form.get('age'))
-#   Session = sessionmaker(bind=engine)
-#   ses = Session()
-#   mydata = ses.query(Mydata).filter(Mydata.id == id).one()
-#   mydata.name = name
-#   mydata.mail = mail
-#   mydata.age = int(age)
-#   ses.add(mydata)
-#   ses.commit()
-#   ses.close()
-#   return 'ok'
-
-
 if __name__ == '__main__':
   app.debug = True
   app.run(host='localhost')
-
-

@@ -27,19 +27,26 @@ Index
             <h5>{{alert}}</h5>
         </div>
         <div class="form-group">
-            <label for="id">Name</label>
+            <label for="id">タイトル</label>
             <input type="text" class="form-control"
-                id="name" v-model="f_name">
+                id="title" v-model="f_title" maxlength="10" placeholder="タイトルを入力してね">
         </div>
         <div class="form-group">
-            <label for="id">Mail</label>
-            <input type="email" class="form-control"
-                id="mail" v-model="f_mail">
+          <label for="id">著者名</label>
+          <input type="text" class="form-control"
+                id="author" v-model="f_author" placeholder='著者名'>
         </div>
         <div class="form-group">
-            <label for="age">Age</label>
-            <input type="number" class="form-control"
-                id="age" v-model="f_age">
+            <label for="id">日付</label>
+            <input type="date" class="form-control"
+                id="date" v-model="f_date">
+        </div>
+
+        <div class="form-group">
+            <label for="id">内容</label>
+            <textarea cols="123" rows="10" type="text" class="form-control"
+                id="content" v-model="f_content" placeholder='内容'>
+            </textarea>
         </div>
         <div class="form-group">
             <button class="btn btn-primary"
@@ -50,17 +57,19 @@ Index
         <thead>
             <tr>
                 <th>ID</th>
-                <th>Name</th>
-                <th>Mail</th>
-                <th>Age</th>
+                <th>Title</th>
+                <th>Author</th>
+                <th>Date</th>
+                <th>Content</th>
             </tr>
         </thead>
         <tbody>
             <tr v-for="item in data">
                 <th>{{item.id}}</th>
-                <td>{{item.name}}</td>
-                <td>{{item.mail}}</td>
-                <td>{{item.age}}</td>
+                <th>{{item.title}}</th>
+                <td>{{item.author}}</td>
+                <td>{{item.date}}</td>
+                <td>{{item.content}}</td>
             </tr>
         </tbody>
         </table>
@@ -73,11 +82,12 @@ Index
     template: '#mycomp-template',
     data: function() {
         return {
-            f_name:'',
-            f_mail:'',
-            f_age:0,
-            alert:'データを追加してね.',
-            data: [(-1,'wait...','','')]
+            f_title:'',
+            f_author:'',
+            f_date:'',
+            f_content:'',
+            alert:'自分専用の読書記録をつけよう！.',
+            data: [(-1,'wait...','','','')]
         }
     },
     methods:{
@@ -90,9 +100,10 @@ Index
 
       action: function() {
         let formData = new FormData();
-        formData.append('name',this.f_name);
-        formData.append('mail',this.f_mail);
-        formData.append('age',this.f_age);
+        formData.append('title',this.f_title);
+        formData.append('author',this.f_author);
+        formData.append('date',this.f_date);
+        formData.append('content',this.f_content);
         let self = this;
         $.ajax({
           type:'POST',
@@ -102,9 +113,10 @@ Index
           contentType:false,
 
           success: function(data){
-            self.f_name='';
-            self.f_mail='';
-            self.f_age=0;
+            self.f_title='';
+            self.f_author='';
+            self.f_date='';
+            self.f_content='';
             self.getdata();
           },
           error: function(request,status,err) {
@@ -131,3 +143,4 @@ new Vue({
 {% block footer %}
 copyright 2019 SYODA-Tuyano.
 {% endblock %}
+Footer
